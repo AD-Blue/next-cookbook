@@ -12,13 +12,13 @@ const RecipeField = ({
   setStateFunction,
 }: RecipeFieldProps) => {
   return (
-    <div>
-      <p>{title}</p>
+    <div className="w-4/5 max-w-4/5 mb-4">
+      <p className="mb-2">{title}</p>
       <input
         type="text"
         value={stateValue}
         onChange={(e) => setStateFunction(e.target.value)}
-        className="shadow"
+        className="shadow w-full"
       />
     </div>
   );
