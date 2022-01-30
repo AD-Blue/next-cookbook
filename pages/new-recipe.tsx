@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { GetServerSideProps } from "next";
+import { getSession, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 import axios from "axios";
 
 import Layout from "../components/layout/layout";
@@ -15,6 +18,9 @@ const NewRecipe = () => {
   const [image, setImage] = useState("");
   const [ingredientList, setIngredientList] = useState<string[]>([]);
   const [stepList, setStepList] = useState<string[]>([]);
+
+  const router = useRouter();
+  const { data: session } = useSession();
 
   const clearAll = () => {
     setTitle("");
@@ -45,14 +51,15 @@ const NewRecipe = () => {
       description,
       ingredients: ingredientList,
       steps: stepList,
+      author: session?.user?.email as string,
+      image: image ?? "",
     };
-
-    newRecipe.image = image ? image : "no image";
 
     try {
       await axios.post("/api/recipe/create", newRecipe, config);
 
       clearAll();
+      router.push("/");
     } catch {
       console.log("Could not post recipe - something went wrong");
     }
@@ -105,5 +112,27 @@ const NewRecipe = () => {
     </Layout>
   );
 };
+
+const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getSession(context);
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/sign-in",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {
+      session,
+      testProp: "THIS BETTER GET RETURNED FFS",
+    },
+  };
+};
+
+export { getServerSideProps };
 
 export default NewRecipe;
