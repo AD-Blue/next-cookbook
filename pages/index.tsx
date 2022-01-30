@@ -1,22 +1,30 @@
 import { GetServerSideProps } from "next";
-import { Session } from "next-auth";
 import { getSession, signIn, useSession } from "next-auth/react";
+import useSWR from "swr";
 
 import Layout from "../components/layout/layout";
 import RecipeList from "../components/recipe/recipe-list";
+import fetcher from "../lib/swr-fetcher";
 
 const Home = () => {
   const { data: session } = useSession();
 
+  const { data: recipeData, error: recipeError } = useSWR(
+    "/api/recipe/recipes",
+    fetcher
+  );
+
+  if (recipeError) {
+    return <p>Error fetching recipe data</p>;
+  }
+
+  if (!recipeData) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <Layout>
-      {session && <RecipeList />}
-      {!session && (
-        <div>
-          <h1>{"The NEXT Cookbook You'll Use"}</h1>
-          <button onClick={() => signIn()}>Start Cooking</button>
-        </div>
-      )}
+      <RecipeList recipeData={recipeData.data} />
     </Layout>
   );
 };

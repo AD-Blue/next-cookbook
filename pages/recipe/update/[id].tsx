@@ -1,16 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GetServerSideProps } from "next";
 import { getSession, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import axios from "axios";
 
-import Layout from "../components/layout/layout";
-import RecipeField from "../components/form/recipe-field";
-import RecipeListField from "../components/form/recipe-list-field";
-import { Recipe } from "../types/recipe";
-import ShowListBox from "../components/form/show-list-box";
+import Layout from "../../../components/layout/layout";
+import RecipeField from "../../../components/form/recipe-field";
+import RecipeListField from "../../../components/form/recipe-list-field";
+import { Recipe } from "../../../types/recipe";
+import ShowListBox from "../../../components/form/show-list-box";
+import useSWR from "swr";
 
-const NewRecipe = () => {
+const UpdateRecipe = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [ingredient, setIngredient] = useState("");
@@ -21,6 +22,32 @@ const NewRecipe = () => {
 
   const router = useRouter();
   const { data: session } = useSession();
+  const recipeId = router.query.id;
+
+  const { data: recipeData, error: recipeError } = useSWR(
+    `/api/recipe/recipe?recipeId=${recipeId}`
+  );
+
+  useEffect(() => {
+    if (recipeData) {
+      setTitle(recipeData.data.title);
+      setDescription(recipeData.data.description);
+      setIngredientList(recipeData.data.ingredients);
+      setStepList(recipeData.data.steps);
+
+      if (recipeData.data.image) {
+        setImage(recipeData.data.image);
+      }
+    }
+  }, [recipeData]);
+
+  if (recipeError) {
+    return <p>Error - could not find recipe</p>;
+  }
+
+  if (!recipeData) {
+    return <p>Loading...</p>;
+  }
 
   const clearAll = () => {
     setTitle("");
@@ -30,7 +57,7 @@ const NewRecipe = () => {
     setStepList([]);
   };
 
-  const onClick = async () => {
+  const onClick = async (recipeId: string) => {
     const config = {
       headers: {
         "Content-Type": "application/json",
@@ -46,7 +73,7 @@ const NewRecipe = () => {
       console.log("Could not upload recipe, missing required fields");
     }
 
-    const newRecipe: Recipe = {
+    const updatedRecipe: Recipe = {
       title,
       description,
       ingredients: ingredientList,
@@ -56,18 +83,22 @@ const NewRecipe = () => {
     };
 
     try {
-      await axios.post("/api/recipe/create", newRecipe, config);
+      await axios.put(
+        `/api/recipe/update?recipeId=${recipeId}`,
+        updatedRecipe,
+        config
+      );
 
       clearAll();
       router.push("/");
     } catch {
-      console.log("Could not post recipe - something went wrong");
+      console.log("Could not update recipe - something went wrong");
     }
   };
 
   return (
     <Layout>
-      <h1 className="mb-2">Create a new Recipe</h1>
+      <h1 className="mb-2">Update This Recipe</h1>
       <div className="flex flex-col sm:flex-row justify-between">
         <div className="w-1/4 max-w-1/4">
           <RecipeField
@@ -106,7 +137,10 @@ const NewRecipe = () => {
         </div>
       </div>
 
-      <button className="shadow p-2 rounded-md" onClick={onClick}>
+      <button
+        className="shadow p-2 rounded-md"
+        onClick={() => onClick(recipeData.data._id)}
+      >
         Submit
       </button>
     </Layout>
@@ -134,4 +168,4 @@ const getServerSideProps: GetServerSideProps = async (context) => {
 
 export { getServerSideProps };
 
-export default NewRecipe;
+export default UpdateRecipe;

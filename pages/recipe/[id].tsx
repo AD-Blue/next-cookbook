@@ -19,8 +19,12 @@ const RecipePage = () => {
     return <p>Failed to load recipe</p>;
   }
 
-  if (!recipeData || !recipeData.data) {
+  if (!recipeData || !recipeData) {
     return <p>Loading...</p>;
+  }
+
+  if (recipeData.data === null) {
+    router.push("/");
   }
 
   const deleteRecipe = async (id: string) => {
@@ -48,9 +52,16 @@ const RecipePage = () => {
         <li key={step}>{step}</li>
       ))}
       {session?.user?.email === recipeData.data.author && (
-        <button onClick={() => deleteRecipe(recipeData.data._id)}>
-          Delete this recipe
-        </button>
+        <div className="flex flex-col gap-2">
+          <button
+            onClick={() => router.push(`/recipe/update/${recipeData.data._id}`)}
+          >
+            Update this recipe
+          </button>
+          <button onClick={() => deleteRecipe(recipeData.data._id)}>
+            Delete this recipe
+          </button>
+        </div>
       )}
     </Layout>
   );

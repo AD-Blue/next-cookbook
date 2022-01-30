@@ -15,5 +15,6 @@ export interface RecipeDocument {
   description: string;
   ingredients: string[];
   steps: string[];
+  author: string;
   image?: string;
 }
