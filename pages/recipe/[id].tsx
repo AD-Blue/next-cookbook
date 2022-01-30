@@ -1,5 +1,7 @@
 import { useRouter } from "next/router";
 import useSWR from "swr";
+
+import Layout from "../../components/layout/layout";
 import fetcher from "../../lib/swr-fetcher";
 
 const RecipePage = () => {
@@ -19,10 +21,19 @@ const RecipePage = () => {
   }
 
   return (
-    <div>
+    <Layout>
       <h1>Recipe</h1>
       <p>{recipeData.data.title}</p>
-    </div>
+      <p>{recipeData.data.description}</p>
+      <p>Ingredients</p>
+      {recipeData.data.ingredients.map((ingredient: string) => (
+        <li key={ingredient}>{ingredient}</li>
+      ))}
+      <p>Steps</p>
+      {recipeData.data.steps.map((step: string) => (
+        <li key={step}>{step}</li>
+      ))}
+    </Layout>
   );
 };
 

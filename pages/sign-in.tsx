@@ -1,19 +1,19 @@
 import { GetServerSideProps } from "next";
 import { Session } from "next-auth";
-import { getSession, signIn, useSession } from "next-auth/react";
+import { useSession, signIn, getSession } from "next-auth/react";
 
 import Layout from "../components/layout/layout";
-import RecipeList from "../components/recipe/recipe-list";
 
-const Home = () => {
-  const { data: session } = useSession();
+interface SignInProps {
+  session: Session;
+}
 
+const SignIn = ({ session }: SignInProps) => {
   return (
     <Layout>
-      {session && <RecipeList />}
       {!session && (
         <div>
-          <h1>{"The NEXT Cookbook You'll Use"}</h1>
+          <h1>The NEXT Cookbook For You</h1>
           <button onClick={() => signIn()}>Start Cooking</button>
         </div>
       )}
@@ -24,22 +24,20 @@ const Home = () => {
 const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
 
-  if (!session) {
+  if (session) {
     return {
       redirect: {
-        destination: "/sign-in",
+        destination: "/",
         permanent: false,
       },
     };
   }
 
   return {
-    props: {
-      session,
-    },
+    props: {},
   };
 };
 
 export { getServerSideProps };
 
-export default Home;
+export default SignIn;

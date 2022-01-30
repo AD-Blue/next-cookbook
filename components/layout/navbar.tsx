@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 
 const Navbar = () => {
   const { data: session } = useSession();
@@ -17,10 +17,11 @@ const Navbar = () => {
 
       {!session && <button onClick={() => signIn()}>Sign In</button>}
       {session && (
-        <div className="flex flex-row justify-between w-1/6 max-w-1/6">
-          <p>{session.user?.name}</p>
-          <button onClick={() => signOut()}>Sign Out</button>
-        </div>
+        <Link
+          href={`/users/${encodeURIComponent(session?.user?.email as string)}`}
+        >
+          {session?.user?.name}
+        </Link>
       )}
     </div>
   );

@@ -9,7 +9,7 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <>
       <Navbar />
-      <main className="mx-6 h-full min-h-full py-8 px-4">{children}</main>
+      <main className="mx-16 h-full min-h-full py-8 px-4">{children}</main>
       <Footer />
     </>
   );

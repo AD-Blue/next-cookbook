@@ -12,8 +12,6 @@ export default async function handler(
 
     const recipeList = await recipeCollection.aggregate().toArray();
 
-    console.log(recipeList);
-
     return res.status(200).json({
       message: "Successfully fetched from database",
       data: recipeList,
