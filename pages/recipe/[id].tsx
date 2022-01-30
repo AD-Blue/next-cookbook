@@ -1,3 +1,5 @@
+import axios from "axios";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 
@@ -11,6 +13,7 @@ const RecipePage = () => {
     `/api/recipe/recipe?recipeId=${id}`,
     fetcher
   );
+  const { data: session } = useSession();
 
   if (recipeError) {
     return <p>Failed to load recipe</p>;
@@ -20,10 +23,21 @@ const RecipePage = () => {
     return <p>Loading...</p>;
   }
 
+  const deleteRecipe = async (id: string) => {
+    try {
+      await axios.delete(`/api/recipe/delete?recipe=${id}`);
+
+      router.push("/");
+    } catch {
+      console.log("Error - Could not delete recipe");
+    }
+  };
+
   return (
     <Layout>
       <h1>Recipe</h1>
       <p>{recipeData.data.title}</p>
+      <p>Author: {recipeData.data.author}</p>
       <p>{recipeData.data.description}</p>
       <p>Ingredients</p>
       {recipeData.data.ingredients.map((ingredient: string) => (
@@ -33,6 +47,11 @@ const RecipePage = () => {
       {recipeData.data.steps.map((step: string) => (
         <li key={step}>{step}</li>
       ))}
+      {session?.user?.email === recipeData.data.author && (
+        <button onClick={() => deleteRecipe(recipeData.data._id)}>
+          Delete this recipe
+        </button>
+      )}
     </Layout>
   );
 };

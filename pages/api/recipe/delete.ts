@@ -1,13 +1,12 @@
 import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 import clientPromise from "../../../lib/mongodb";
-import { RecipeDocument } from "../../../types/recipe";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const recipeId = req.query.recipeId.toString();
+  const recipeId = req.query.recipe.toString();
 
   if (!recipeId) {
     res.status(400).json({ message: "Error - missing recipe id" });
@@ -18,16 +17,18 @@ export default async function handler(
       .db(process.env.DATABASE_NAME as string)
       .collection("recipes");
 
-    const recipe = await recipeCollection.findOne({
+    await recipeCollection.deleteOne({
       _id: new ObjectId(recipeId),
     });
 
-    return res.status(200).json({
-      message: "Successfully fetched from database",
-      data: recipe,
-    });
+    console.log("SUCCESSFULLY DELETED");
+
+    return res
+      .status(200)
+      .json({ message: "Successfully deleted from database" });
   } catch (error) {
-    console.log(`Error: ${error}`);
+    console.log(error);
+
     return res.status(500).json({ message: "Internal server error" });
   }
 }
