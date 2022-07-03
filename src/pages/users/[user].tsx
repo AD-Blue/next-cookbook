@@ -4,7 +4,7 @@ import { getSession, signOut, useSession } from "next-auth/react";
 import Layout from "../../components/layout/layout";
 import { GetServerSideProps } from "next";
 import useSWR from "swr";
-import fetcher from "../../lib/swr-fetcher";
+import fetcher from "../../../lib/swr-fetcher";
 import RecipeList from "../../components/recipe/recipe-list";
 
 const User = () => {

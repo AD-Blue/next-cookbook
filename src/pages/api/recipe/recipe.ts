@@ -1,14 +1,16 @@
+import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
-import clientPromise from "../../../lib/mongodb";
+import clientPromise from "../../../../lib/mongodb";
+import { RecipeDocument } from "../../../types/recipe";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const user = req.query.user.toString();
+  const recipeId = req.query.recipeId.toString();
 
-  if (!user) {
-    res.status(404).json({ message: "Could not find user" });
+  if (!recipeId) {
+    res.status(400).json({ message: "Error - missing recipe id" });
   }
 
   try {
@@ -16,16 +18,16 @@ export default async function handler(
       .db(process.env.DATABASE_NAME as string)
       .collection("recipes");
 
-    const recipeList = await recipeCollection
-      .aggregate([{ $match: { author: user } }])
-      .toArray();
+    const recipe = await recipeCollection.findOne({
+      _id: new ObjectId(recipeId),
+    });
 
     return res.status(200).json({
       message: "Successfully fetched from database",
-      data: recipeList,
+      data: recipe,
     });
-  } catch {
-    console.log("Whoopsie daisy");
+  } catch (error) {
+    console.log(`Error: ${error}`);
     return res.status(500).json({ message: "Internal server error" });
   }
 }

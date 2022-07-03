@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import useSWR from "swr";
 
 import Layout from "../../components/layout/layout";
-import fetcher from "../../lib/swr-fetcher";
+import fetcher from "../../../lib/swr-fetcher";
 
 const RecipePage = () => {
   const router = useRouter();
@@ -19,7 +19,7 @@ const RecipePage = () => {
     return <p>Failed to load recipe</p>;
   }
 
-  if (!recipeData || !recipeData) {
+  if (!recipeData || !recipeData || !id) {
     return <p>Loading...</p>;
   }
 
@@ -40,7 +40,7 @@ const RecipePage = () => {
   return (
     <Layout>
       <h1>Recipe</h1>
-      <p>{recipeData.data.title}</p>
+      <p>{recipeData?.data?.title}</p>
       <p>Author: {recipeData.data.author}</p>
       <p>{recipeData.data.description}</p>
       <p>Ingredients</p>

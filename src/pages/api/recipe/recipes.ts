@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import clientPromise from "../../../lib/mongodb";
+import clientPromise from "../../../../lib/mongodb";
 
 export default async function handler(
   req: NextApiRequest,
@@ -10,10 +10,14 @@ export default async function handler(
       .db(process.env.DATABASE_NAME as string)
       .collection("recipes");
 
-    await recipeCollection.insertOne(req.body);
+    const recipeList = await recipeCollection.aggregate().toArray();
 
-    return res.status(200).json({ message: "Successfully added to database" });
+    return res.status(200).json({
+      message: "Successfully fetched from database",
+      data: recipeList,
+    });
   } catch {
+    console.log("Whoopsie daisy");
     return res.status(500).json({ message: "Internal server error" });
   }
 }

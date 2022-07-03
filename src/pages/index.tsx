@@ -4,7 +4,7 @@ import useSWR from "swr";
 
 import Layout from "../components/layout/layout";
 import RecipeList from "../components/recipe/recipe-list";
-import fetcher from "../lib/swr-fetcher";
+import fetcher from "../../lib/swr-fetcher";
 
 const Home = () => {
   const { data: session } = useSession();
