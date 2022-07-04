@@ -1,4 +1,4 @@
-import "tailwindcss/tailwind.css";
+import "../styles/global.css";
 import type { AppProps } from "next/app";
 import { SessionProvider } from "next-auth/react";
 

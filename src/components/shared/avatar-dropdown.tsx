@@ -8,7 +8,7 @@ const AvatarDropdown = () => {
 
   return (
     <Menu>
-      <Menu.Button as="div" className="flex">
+      <Menu.Button as="div" className="flex hover:cursor-pointer">
         <Image
           height={30}
           width={30}
